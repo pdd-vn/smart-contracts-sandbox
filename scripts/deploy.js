@@ -7,7 +7,8 @@ async function main() {
   const accounts = await ethers.getSigners();
   const minter = accounts[0];
   const buyer = accounts[1];
-  console.log('prepare accounts');
+  console.log("minter: ", minter.address);
+  console.log("buyer: ", buyer.address);
 
   // deploy erc20 and machine
   const erc20 = await new typechain.MyERC20Token__factory(minter).deploy(minter.address);

@@ -1,0 +1,13 @@
+/node_modules
+/contracts
+/.vscode
+/scripts
+/test
+/web3py_interact
+General.png
+hardhat.config.ts 
+/src
+gas-report.txt
+/cache
+/artifacts
+.env

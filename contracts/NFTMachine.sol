@@ -14,7 +14,7 @@ contract NFTMachine is MyNFTToken {
         string uri;
         address owner;
         address tmpOwner;
-        uint256 lendingDay;
+        uint256 lending;
         uint256 period;
         uint8 interest;
     }
@@ -59,7 +59,7 @@ contract NFTMachine is MyNFTToken {
 
         // Put NFT on hold
         tokenIdToProduct[_tokenId].tmpOwner = msg.sender;
-        tokenIdToProduct[_tokenId].lendingDay = block.timestamp;
+        tokenIdToProduct[_tokenId].lending = block.timestamp; // second, not day
         tokenIdToProduct[_tokenId].interest = interest;
     }
 
@@ -68,12 +68,11 @@ contract NFTMachine is MyNFTToken {
         require(tokenIdToProduct[_tokenId].tmpOwner != address(0), "NFT is not on hold");
         require(tokenIdToProduct[_tokenId].owner == msg.sender, "Not original owner of NFT");
         require(
-            tokenIdToProduct[_tokenId].period > block.timestamp - tokenIdToProduct[_tokenId].lendingDay, 
-            "The loan is overdue. NFT will be transfered to new owner."
+            tokenIdToProduct[_tokenId].period > (block.timestamp - tokenIdToProduct[_tokenId].lending) / 86400, 
+            "The loan is overdue. NFT will be transfered to new owner"
         );
 
-        // Second to day
-        uint256 loan = tokenIdToProduct[_tokenId].price * ((block.timestamp - tokenIdToProduct[_tokenId].lendingDay) / 86400) * tokenIdToProduct[_tokenId].interest;
+        uint256 loan = tokenIdToProduct[_tokenId].price * ((block.timestamp - tokenIdToProduct[_tokenId].lending) / 86400) * tokenIdToProduct[_tokenId].interest;
         require(
             IERC20(erc20Address).allowance(msg.sender, tokenIdToProduct[_tokenId].tmpOwner) >= loan,
             "Insufficient approval"
@@ -89,14 +88,14 @@ contract NFTMachine is MyNFTToken {
         // Temporary Owner will call this function to claim the ownership of NFT
         require(tokenIdToProduct[_tokenId].tmpOwner == msg.sender, "Not temporary owner");
         require(
-            tokenIdToProduct[_tokenId].period < block.timestamp - tokenIdToProduct[_tokenId].lendingDay, 
+            tokenIdToProduct[_tokenId].period < (block.timestamp - tokenIdToProduct[_tokenId].lending) / 86400, 
             "The lending process is still in the middle of the period. Can't claim yet"
         );
 
         // Set ownership to new owner
         tokenIdToProduct[_tokenId].owner = msg.sender;
         tokenIdToProduct[_tokenId].tmpOwner = address(0);
-        tokenIdToProduct[_tokenId].lendingDay = 0;
+        tokenIdToProduct[_tokenId].lending = 0;
         tokenIdToProduct[_tokenId].interest = 0;
     }
 

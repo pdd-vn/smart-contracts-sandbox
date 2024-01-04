@@ -7,6 +7,7 @@ import "./MyNFTToken.sol";
 contract NFTMachine is MyNFTToken {
     address public erc20Address;
     uint8 public interest; // 1 to 100 per day
+    event Number(uint256 amount);
 
     struct Product {
         uint256 tokenId;
@@ -32,8 +33,8 @@ contract NFTMachine is MyNFTToken {
     }
 
     function mintNewNFT(string memory uri, uint256 price, uint256 period) public {
-        // Sender will delegate the NFT to NFTMachine.
-        uint256 tokenId = safeMint(address(this), uri);
+        uint256 tokenId = safeMint(msg.sender, uri);
+        _transfer(msg.sender, owner(), tokenId);
         Product memory newProduct;
         newProduct.tokenId = tokenId;
         newProduct.uri = uri;
@@ -44,16 +45,26 @@ contract NFTMachine is MyNFTToken {
         products.push(newProduct);
     }
 
-    function lend(uint256 _tokenId) public {
+    function approve_to_spend(uint256 _tokenId) public {
         require(
-            IERC20(erc20Address).allowance(msg.sender, tokenIdToProduct[_tokenId].owner) >=
+            IERC20(erc20Address).balanceOf(msg.sender) >=
                 tokenIdToProduct[_tokenId].price,
-            "Insufficient approval"
+            "ERROR: Insufficient balance"
         );
 
+        IERC20(erc20Address).approve(msg.sender, tokenIdToProduct[_tokenId].price);
+    }
+
+    function lend(uint256 _tokenId) public {
+        // require(
+        //     IERC20(erc20Address).allowance(msg.sender, address(this)) >=
+        //         tokenIdToProduct[_tokenId].price,
+        //     "ERROR: Insufficient approval"
+        // );
+
         IERC20(erc20Address).transferFrom(
-            msg.sender,
-            tokenIdToProduct[_tokenId].owner,
+            address(this),
+            address(tokenIdToProduct[_tokenId].owner),
             tokenIdToProduct[_tokenId].price
         );
 
@@ -72,7 +83,7 @@ contract NFTMachine is MyNFTToken {
             "The loan is overdue. NFT will be transfered to new owner"
         );
 
-        uint256 loan = tokenIdToProduct[_tokenId].price * ((block.timestamp - tokenIdToProduct[_tokenId].lending) / 86400) * tokenIdToProduct[_tokenId].interest;
+        uint256 loan = tokenIdToProduct[_tokenId].price * ((block.timestamp - tokenIdToProduct[_tokenId].lending) / 86400) * tokenIdToProduct[_tokenId].interest / 100;
         require(
             IERC20(erc20Address).allowance(msg.sender, tokenIdToProduct[_tokenId].tmpOwner) >= loan,
             "Insufficient approval"
@@ -82,6 +93,9 @@ contract NFTMachine is MyNFTToken {
             tokenIdToProduct[_tokenId].owner,
             loan
         );
+    
+        // Return NFT to owner
+        _transfer(owner(), tokenIdToProduct[_tokenId].owner, _tokenId);
     }
 
     function claim(uint256 _tokenId) public {
@@ -91,12 +105,15 @@ contract NFTMachine is MyNFTToken {
             tokenIdToProduct[_tokenId].period < (block.timestamp - tokenIdToProduct[_tokenId].lending) / 86400, 
             "The lending process is still in the middle of the period. Can't claim yet"
         );
+        // Return NFT to new owner
+        _transfer(owner(), tokenIdToProduct[_tokenId].tmpOwner, _tokenId);
 
         // Set ownership to new owner
         tokenIdToProduct[_tokenId].owner = msg.sender;
         tokenIdToProduct[_tokenId].tmpOwner = address(0);
         tokenIdToProduct[_tokenId].lending = 0;
         tokenIdToProduct[_tokenId].interest = 0;
+
     }
 
     function getAllNFT() public view returns (Product[] memory) {

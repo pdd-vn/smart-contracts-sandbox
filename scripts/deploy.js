@@ -14,11 +14,12 @@ async function main() {
   const erc20 = await new typechain.MyERC20Token__factory(minter).deploy(minter.address);
   console.log('erc20: ', erc20.target);
 
-  const machine = await new typechain.NFTMachine__factory(minter).deploy(erc20.target);
+  const machine = await new typechain.NFTMachine__factory(minter).deploy(erc20.target, 10);
   console.log('machine: ', machine.target);
 
   // mint token for buyer
   let tx = await erc20.connect(minter).mint(buyer.address, 10);
+  let tx2 = await erc20.connect(minter).mint(minter.address, 1000);
   console.log('tx mint token: ', tx.hash);
 
   // set approve for machine

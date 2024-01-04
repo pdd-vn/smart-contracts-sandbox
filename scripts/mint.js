@@ -7,23 +7,22 @@ owner_addr = "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"
 buyer_addr = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
 
 async function main() {
-    const erc20 = await ethers.getContractAt(
-        "MyERC20Token",
-        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-    );
-    await erc20.mint(owner_addr, 1000);
+    // const erc20 = await ethers.getContractAt(
+    //     "MyERC20Token",
+    //     "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+    // );
+    // await erc20.mint(owner_addr, 1000);
 
     const machine = await ethers.getContractAt(
-        "NFTMachine",
+        "LendingMachine",
         machine_addr
     );
 
     const buyer = await ethers.getSigner(buyer_addr);
-    await machine.connect(buyer).mintNewNFT("www.example.com", 10, 3)
+    const owner = await ethers.getSigner(owner_addr);
 
-    // const owner = await ethers.getSigner(owner_addr);
-    // await machine.connect(owner).mintNewNFT("www.example.com", 10, 5)
-    console.log(await machine.getAllNFT())
+    await machine.connect(buyer).mintNewNFT("www.example.com")
+    await machine.connect(buyer).deposit(0)
 }
 
 // We recommend this pattern to be able to use async/await everywhere

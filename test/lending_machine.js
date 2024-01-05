@@ -49,19 +49,45 @@ describe("LendingMachine", function () {
     expect(await machine.connect(minter).tokenURI(0) == "nft1.com", "Wrong NFT uri");
     expect(await machine.connect(minter).tokenURI(1) == "nft2.com", "Wrong NFT uri");
     expect(await machine.connect(minter).tokenURI(2) == "nft3.com", "Wrong NFT uri");
+
+    expect(await machine.connect(minter).get_num_nfts() == 3, "Wrong number of nfts");
   });
 
   it("should deposit nft successfully", async function () {
     const { minter, buyer, erc20, machine } = await loadFixture(prepare);
-    machine.on("MintNewNFT", (token_id) => {
-      console.log("token_id", token_id)
-    });
+    expect(await machine.connect(buyer).mint_new_nft("nft1.com")).to.emit(machine, "MintNewNFT");
 
-    const tx = await machine.connect(minter).mint_new_nft("nft1.com");
-    await tx.wait();
-    console.log(tx);
-    // await machine.connect(buyer).deposit(0)
+    // First nft always have id 0
+    await machine.connect(buyer).deposit(0, 5);
+    expect(await machine.connect(minter).balanceOf(buyer.address) == 0, "Buyer Lending Machine balance should be 0");
+    expect(await machine.connect(minter).balanceOf(machine.getAddress()) == 1, "Lending Machine balance should be 1");
+
+    expect(await machine.connect(buyer).mint_new_nft("nft2.com")).to.emit(machine, "MintNewNFT");
+    await machine.connect(buyer).deposit(1, 5);
+    expect(await machine.connect(minter).balanceOf(machine.getAddress()) == 2, "Lending Machine balance should be 2");
   });
+
+  it("should lend nft successfully", async function () {
+    const { minter, buyer, erc20, machine } = await loadFixture(prepare);
+    expect(await machine.connect(buyer).mint_new_nft("nft1.com")).to.emit(machine, "MintNewNFT");
+
+    // First nft always have id 0
+    const price = 5;
+    await machine.connect(buyer).deposit(0, price);
+    expect(await machine.connect(minter).balanceOf(buyer.address) === 0, "Buyer Lending Machine balance should be 0");
+    expect(await machine.connect(minter).balanceOf(machine.getAddress()) === 1, "Lending Machine balance should be 1");
+
+    await erc20.connect(minter).approve(machine.getAddress(), price);
+    await machine.connect(minter).lend(0);
+    const buyer_erc20_balance = await erc20.connect(buyer).balanceOf(buyer.address);
+    const minter_erc20_balance = await erc20.connect(minter).balanceOf(minter.address);
+    console.log("buyer_erc20_balance: ", buyer_erc20_balance == 1);
+    console.log("minter_erc20_balance: ", minter_erc20_balance);
+
+    // expect(await erc20.connect(buyer).balanceOf(buyer.address) === 15, "Buyer LME20T balance should be 15");
+    // expect(await erc20.connect(minter).balanceOf(minter.address) === 995, "Buyer LME20T balance should be 995");
+  });
+
 });
 
 

@@ -4,6 +4,7 @@ import "./LendingMachineBase.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract LendingMachine is LendingMachineBase {
+    // owner is operator :)
     address public ERC20_ADDRESS;
     uint8 public INTEREST; // 1 to 100 percent per day
     uint16 public NUM_NFTS;
@@ -16,7 +17,7 @@ contract LendingMachine is LendingMachineBase {
         uint256 price;
         address tmp_owner;
         uint256 lending_at;
-        uint8 interest;
+        uint256 interest;
         uint8 lend_duration;
         bool is_deposited;
     }
@@ -52,24 +53,19 @@ contract LendingMachine is LendingMachineBase {
         );
         nft_id_mapping[token_id].price = price;
         nft_id_mapping[token_id].is_deposited = true;
-        transferFrom(msg.sender, address(this), token_id);
+        transferFrom(msg.sender, owner(), token_id);
     }
 
     function lend(uint256 token_id) public {
         NFT memory token = nft_id_mapping[token_id];
 
-        require(
-            token.owner != msg.sender,
-            "ERROR: Owners can't lend themself"
-        );
+        require(token.owner != msg.sender, "ERROR: Owners can't lend themself");
+
+        require(token.is_deposited, "ERROR: NFT is not deposited");
 
         require(
-            token.is_deposited,
-            "ERROR: NFT is not deposited"
-        );
-
-        require(
-            IERC20(ERC20_ADDRESS).allowance(msg.sender, address(this)) >= token.price,
+            IERC20(ERC20_ADDRESS).allowance(msg.sender, address(this)) >=
+                token.price,
             "ERROR: Insufficient allowance"
         );
 
@@ -95,33 +91,38 @@ contract LendingMachine is LendingMachineBase {
 
         require(token.tmp_owner != address(0), "ERROR: Token is not lended");
 
-        uint256 current_lend_duration = (block.timestamp - token.lending_at) / 86400;
+        uint256 current_lend_duration = (block.timestamp - token.lending_at) /
+            86400;
         require(
-            current_lend_duration <= token.lend_duration, 
+            current_lend_duration <= token.lend_duration,
             "ERROR: Lend duration exceeded. NFT will be transfered to new owner"
         );
 
-        uint256 debt = token.price * current_lend_duration * (1 + token.interest / 100);
+        uint256 debt = token.price + current_lend_duration * token.interest;
         require(
             IERC20(ERC20_ADDRESS).allowance(msg.sender, address(this)) >= debt,
             "ERROR: Insufficient allowance"
         );
         require(
-            IERC20(ERC20_ADDRESS).balanceOf(token.owner) >= debt, 
+            IERC20(ERC20_ADDRESS).balanceOf(token.owner) >= debt,
             "ERROR: Insufficient balance"
         );
-        IERC20(ERC20_ADDRESS).transferFrom(
-            msg.sender,
-            token.tmp_owner,
-            debt
-        );
+        IERC20(ERC20_ADDRESS).transferFrom(msg.sender, token.tmp_owner, debt);
         nft_id_mapping[token_id].tmp_owner = address(0);
         nft_id_mapping[token_id].interest = 0;
         nft_id_mapping[token_id].lending_at = 0;
-        transferFrom(address(this), msg.sender, token_id);
+        transferFrom(owner(), msg.sender, token_id);
     }
 
     function get_num_nfts() public view returns (uint16) {
         return NUM_NFTS;
+    }
+
+    function list_nfts() public view returns (NFT[] memory) {
+        NFT[] memory nfts = new NFT[](NUM_NFTS);
+        for (uint i = 0; i < NUM_NFTS; i++) {
+            nfts[i] = nft_id_mapping[i];
+        }
+        return nfts;
     }
 }

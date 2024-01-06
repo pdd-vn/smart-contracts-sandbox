@@ -2,11 +2,12 @@
 pragma solidity ^0.8.21;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract LendingMachineBase is ERC721, ERC721URIStorage {
+contract LendingMachineBase is ERC721, ERC721URIStorage, Ownable {
     uint256 private _nextTokenId;
 
-    constructor() ERC721("LendingMachine", "LM") {}
+    constructor() ERC721("LendingMachine", "LM") Ownable(msg.sender) {}
 
     function safeMint(address to, string memory uri) public returns (uint256) {
         uint256 tokenId = _nextTokenId++;

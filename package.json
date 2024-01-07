@@ -22,15 +22,15 @@
     "dotenv": "^16.3.1",
     "ethers": "^6.8.1"
   },
-  "name": "nft-machine",
-  "description": "NFT Machine",
-  "version": "0.0.0",
+  "name": "nft-lending-machine",
+  "description": "NFT Lending Machine",
+  "version": "0.0.3",
   "main": "dist/src/types/index.js",
   "types": "dist/src/types/index.d.ts",
   "directories": {
     "test": "test"
   },
-  "author": "vuonghuuhung",
+  "author": "pdd",
   "license": "ISC",
   "type": "commonjs"
 }

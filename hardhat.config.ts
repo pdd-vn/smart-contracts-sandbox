@@ -16,6 +16,7 @@ module.exports = {
         mnemonic: process.env.MNEMONIC
       },
       chainId: 11155111,
+      blockGasLimit: 6000000
     },
     hardhat: {
       allowUnlimitedContractSize: true,

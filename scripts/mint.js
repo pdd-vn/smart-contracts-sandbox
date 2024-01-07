@@ -1,15 +1,23 @@
 const hre = require("hardhat");
 const { ethers } = hre;
 
-erc20_addr = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-machine_addr = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
-owner_addr = "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"
-buyer_addr = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+// erc20_addr = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+// machine_addr = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+// owner_addr = "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"
+// buyer_addr = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+
+const erc20_addr = "0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1"
+const machine_addr = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+const owner_addr = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+const buyer_addr = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+// const buyer_addr = "0xf505B2b47BaC8849584915588bA3C0a01bd72206"
+
+
 
 async function main() {
     // const erc20 = await ethers.getContractAt(
-    //     "MyERC20Token",
-    //     "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+    //     "LME20T",
+    //     erc20_addr
     // );
     // await erc20.mint(owner_addr, 1000);
 
@@ -19,10 +27,12 @@ async function main() {
     );
 
     const buyer = await ethers.getSigner(buyer_addr);
-    const owner = await ethers.getSigner(owner_addr);
+    // const owner = await ethers.getSigner(owner_addr);
 
-    await machine.connect(buyer).mintNewNFT("www.example.com")
-    await machine.connect(buyer).deposit(0)
+    // await machine.connect(buyer).mint_new_nft("https://cdn-icons-png.flaticon.com/512/4155/4155897.png")
+
+    // await machine.connect(buyer).mint_new_nft("https://cdn3.iconfinder.com/data/icons/role-playing-game-5/340/rpg_fantasy_medieval_paladin_shield_knight_crusader_cross-512.png")
+    await machine.connect(buyer).deposit(1, 10)
 }
 
 // We recommend this pattern to be able to use async/await everywhere

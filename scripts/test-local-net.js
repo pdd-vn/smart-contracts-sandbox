@@ -1,10 +1,11 @@
 const hre = require("hardhat");
 const { ethers } = hre;
 
-erc20_addr = "0x27566bEb67F55a12860bc3DaA50fF57B3dE76183"
-machine_addr = "0x6168c921c5425859F64a21940bC9841521cf0284"
-owner_addr = "0xf505B2b47BaC8849584915588bA3C0a01bd72206"
-buyer_addr = "0x59B15B86550259199B4534cE075986E6CC1B4412"
+// const buyer_addr = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+const buyer_addr = "0xf505B2b47BaC8849584915588bA3C0a01bd72206"
+const owner_addr = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+const erc20_addr = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+const machine_addr = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
 
 async function main() {
     const erc20 = await ethers.getContractAt(
@@ -23,22 +24,19 @@ async function main() {
     console.log("owner_erc20_balance: ", await erc20.balanceOf(owner_addr));
     console.log("owner_eth_balance: ", await provider.getBalance(owner_addr));
 
-    // Most of the time it's the same as `address`. 
-    // It could be some thing like a domain?
-    console.log("erc20 target: ", erc20.target);
+    // // Most of the time it's the same as `address`. 
+    // // It could be some thing like a domain?
+    // console.log("erc20 target: ", erc20.target);
 
-    const owner = await ethers.getSigner(owner_addr);
     const machine_signer = await ethers.getSigner(machine_addr);
-
     console.log("owner machine balance: ", await machine.connect(machine_signer).balanceOf(owner_addr));
     console.log("buyer machine balance: ", await machine.connect(machine_signer).balanceOf(buyer_addr));
     console.log("machine balance: ", await machine.connect(machine_signer).balanceOf(machine_addr));
-    // console.log("nft uri: ", await machine.connect(machine_signer).tokenURI(0));
-
-    // await erc20.connect(owner).approve(machine_addr, 100);
-    // await machine.connect(owner).lend(100, buyer_addr);
-    // console.log("buyer_erc20_balance: ", await erc20.balanceOf(buyer_addr));
-    // console.log("owner_erc20_balance: ", await erc20.balanceOf(owner_addr));
+    const num_nfts = await machine.connect(machine_signer).get_num_nfts();
+    for (i = 0; i < num_nfts; i++) {
+        console.log(`token_${i}=\"${await machine.connect(machine_signer).tokenURI(i)}\"`)
+    }
+    console.log(`tokens info: ${await machine.connect(machine_signer).list_nfts()}`)
 }
 
 // We recommend this pattern to be able to use async/await everywhere

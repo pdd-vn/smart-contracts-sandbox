@@ -19,7 +19,7 @@ async function main() {
 
   // mint token for buyer
   await erc20.connect(minter).mint(buyer.address, 10);
-  await erc20.connect(minter).mint(minter.address, 1000);
+  await erc20.connect(minter).mint(minter.address, 50);
 
   // set approve for machine
   tx = await machine.connect(minter).setApprovalForAll(machine.target, true);

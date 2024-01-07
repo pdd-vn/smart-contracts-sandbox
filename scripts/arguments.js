@@ -1,5 +1,6 @@
 module.exports = [
-    "0x542B90E379aa59F7557096ebaFDACa48dD7C07C4"
+    "0x27566bEb67F55a12860bc3DaA50fF57B3dE76183",
+    1
 ]
 
 

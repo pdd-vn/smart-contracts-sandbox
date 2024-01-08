@@ -121,16 +121,26 @@ contract LendingMachine is LendingMachineBase {
         NFT memory token = nft_id_mapping[token_id];
         require(msg.sender == token.tmp_owner, "ERROR: Not token's temporary owner");
         
-        require(token.is_deposited, "ERROR: Token is not deposited");
+        // uint256 current_lend_duration = (block.timestamp - token.lending_at) /
+        //     86400;
+        // require(
+        //     current_lend_duration > token.lend_duration,
+        //     "ERROR: Item is still in lending duration. Please wait until lend duration exceeded"
+        // );
 
-        uint256 current_lend_duration = (block.timestamp - token.lending_at) /
-            86400;
-        require(
-            current_lend_duration > token.lend_duration,
-            "ERROR: Item is still in lending duration. Please wait until lend duration exceeded"
-        );
+        // uint256 lending_at;
+        // uint256 interest;
+        // uint8 lend_duration;
+        // bool is_deposited;
 
         transferFrom(owner(), msg.sender, token_id);
+        nft_id_mapping[token_id].owner = msg.sender;
+        nft_id_mapping[token_id].price = 0;
+        nft_id_mapping[token_id].tmp_owner = address(0);
+        nft_id_mapping[token_id].lending_at = 0;
+        nft_id_mapping[token_id].interest = 0;
+        nft_id_mapping[token_id].lend_duration = 0;
+        nft_id_mapping[token_id].is_deposited = false;
     }
 
     function get_num_nfts() public view returns (uint16) {

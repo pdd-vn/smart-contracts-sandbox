@@ -27,7 +27,7 @@ describe("LendingMachine", function () {
     await erc20.connect(minter).mint(minter.address, 1000);
 
     // set approve for machine
-    // await machine.connect(minter).setApprovalForAll(machine.target, true);
+    await machine.connect(minter).setApprovalForAll(machine.target, true);
     return { minter, buyer, erc20, machine };
   }
 
@@ -117,7 +117,6 @@ describe("LendingMachine", function () {
 
     // Repay
     await erc20.connect(buyer).approve(machine.getAddress(), price);
-    await machine.connect(minter).approve(buyer.address, 0);
     expect(await machine.connect(buyer).repay(0)).to.emit(machine, "Transfer");
     console.log("erc20 balance of buyer after repay: ", await erc20.connect(buyer).balanceOf(buyer.address));
     console.log("erc20 blance of owner after repay: ", await erc20.connect(minter).balanceOf(minter.address));

@@ -24,7 +24,7 @@
   },
   "name": "nft-lending-machine",
   "description": "NFT Lending Machine",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "dist/src/types/index.js",
   "types": "dist/src/types/index.d.ts",
   "directories": {

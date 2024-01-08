@@ -114,7 +114,7 @@ contract LendingMachine is LendingMachineBase {
         nft_id_mapping[token_id].tmp_owner = address(0);
         nft_id_mapping[token_id].interest = 0;
         nft_id_mapping[token_id].lending_at = 0;
-        transferFrom(owner(), msg.sender, token_id);
+        this._internal_transfer_nft(msg.sender, token_id);
     }
 
     function claim(uint256 token_id) public {
@@ -128,12 +128,7 @@ contract LendingMachine is LendingMachineBase {
         //     "ERROR: Item is still in lending duration. Please wait until lend duration exceeded"
         // );
 
-        // uint256 lending_at;
-        // uint256 interest;
-        // uint8 lend_duration;
-        // bool is_deposited;
-
-        transferFrom(owner(), msg.sender, token_id);
+        this._internal_transfer_nft(msg.sender, token_id);
         nft_id_mapping[token_id].owner = msg.sender;
         nft_id_mapping[token_id].price = 0;
         nft_id_mapping[token_id].tmp_owner = address(0);
@@ -141,6 +136,11 @@ contract LendingMachine is LendingMachineBase {
         nft_id_mapping[token_id].interest = 0;
         nft_id_mapping[token_id].lend_duration = 0;
         nft_id_mapping[token_id].is_deposited = false;
+    }
+
+    function _internal_transfer_nft(address to, uint256 token_id) public {
+        require(msg.sender == address(this), "What do you think you are doing lol");
+        transferFrom(owner(), to, token_id);
     }
 
     function get_num_nfts() public view returns (uint16) {

@@ -16,10 +16,11 @@ module.exports = {
         mnemonic: process.env.MNEMONIC
       },
       chainId: 11155111,
-      blockGasLimit: 6000000
+      blockGasLimit: 30000000
     },
     hardhat: {
       allowUnlimitedContractSize: true,
+      blockGasLimit: 30000000 // Network block gasLimit
     }
   },
   etherscan: {

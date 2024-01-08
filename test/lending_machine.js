@@ -66,13 +66,13 @@ describe("LendingMachine", function () {
     expect(await machine.connect(buyer).mint_new_nft("nft1.com")).to.emit(machine, "MintNewNFT");
 
     // First nft always have id 0
-    await machine.connect(buyer).deposit(0, 5);
+    await machine.connect(buyer).deposit(0, 5, 1);
     expect(await machine.connect(minter).balanceOf(buyer.address)).to.eq(0);
     // expect(await machine.connect(minter).balanceOf(machine.getAddress())).to.eq(1);
     expect(await machine.connect(minter).balanceOf(minter.address)).to.eq(1);
 
     expect(await machine.connect(buyer).mint_new_nft("nft2.com")).to.emit(machine, "MintNewNFT");
-    await machine.connect(buyer).deposit(1, 5);
+    await machine.connect(buyer).deposit(1, 5, 1);
     expect(await machine.connect(minter).balanceOf(minter.address)).to.eq(2);
   });
 
@@ -82,7 +82,7 @@ describe("LendingMachine", function () {
 
     // First nft always have id 0
     const price = 5;
-    await machine.connect(buyer).deposit(0, price);
+    await machine.connect(buyer).deposit(0, price, 1);
     expect(await machine.connect(minter).balanceOf(buyer.address)).to.eq(0);
     expect(await machine.connect(minter).balanceOf(minter.address)).to.eq(1);
 
@@ -102,7 +102,7 @@ describe("LendingMachine", function () {
 
     // First nft always have id 0
     const price = 5;
-    await machine.connect(buyer).deposit(0, price);
+    await machine.connect(buyer).deposit(0, price, 1);
     expect(await machine.connect(minter).balanceOf(buyer.address)).to.eq(0);
     expect(await machine.connect(minter).balanceOf(minter.address)).to.eq(1);
 

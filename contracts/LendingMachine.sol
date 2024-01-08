@@ -42,7 +42,7 @@ contract LendingMachine is LendingMachineBase {
         NUM_NFTS += 1;
     }
 
-    function deposit(uint256 token_id, uint256 price) public {
+    function deposit(uint256 token_id, uint256 price, uint8 lend_duration) public {
         require(
             nft_id_mapping[token_id].is_deposited == false,
             "ERROR: Token is not deposited or does not exist"
@@ -54,6 +54,8 @@ contract LendingMachine is LendingMachineBase {
         );
         nft_id_mapping[token_id].price = price;
         nft_id_mapping[token_id].is_deposited = true;
+        nft_id_mapping[token_id].lend_duration = lend_duration;
+
         transferFrom(msg.sender, owner(), token_id);
     }
 

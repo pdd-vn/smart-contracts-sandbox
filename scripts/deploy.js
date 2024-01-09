@@ -14,7 +14,7 @@ async function main() {
   const erc20 = await new typechain.LME20T__factory(minter).deploy(minter.address);
   console.log('erc20: ', erc20.target);
 
-  const machine = await new typechain.LendingMachine__factory(minter).deploy(erc20.target, 10);
+  const machine = await new typechain.LendingMachine__factory(minter).deploy(erc20.target, 1);
   console.log('machine: ', machine.target);
 
   // mint token for buyer

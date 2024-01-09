@@ -127,4 +127,30 @@ describe("LendingMachine", function () {
     expect(await machine.connect(minter).balanceOf(buyer.address)).to.eq(1);
     expect(await machine.connect(minter).balanceOf(minter.address)).to.eq(0);
   });
+
+  it("should claim nft successfully", async function () {
+    const { minter, buyer, erc20, machine } = await loadFixture(prepare);
+    log_address(minter, buyer, erc20, machine);
+    expect(await machine.connect(buyer).mint_new_nft("nft1.com")).to.emit(machine, "MintNewNFT");
+
+    // First nft always have id 0
+    const price = 5;
+    await machine.connect(buyer).deposit(0, price, 1);
+    expect(await machine.connect(minter).balanceOf(buyer.address)).to.eq(0);
+    expect(await machine.connect(minter).balanceOf(minter.address)).to.eq(1);
+
+    // Lend
+    await erc20.connect(minter).approve(machine.getAddress(), price);
+    await machine.connect(minter).lend(0);
+
+    // Claim
+    expect(await machine.connect(minter).claim(0)).to.emit(machine, "Transfer");
+
+    // Check
+    expect(await erc20.connect(buyer).balanceOf(buyer.address)).to.eq(15);
+    expect(await erc20.connect(minter).balanceOf(minter.address)).to.eq(995);
+    expect(await machine.connect(minter).balanceOf(buyer.address)).to.eq(0);
+    expect(await machine.connect(minter).balanceOf(minter.address)).to.eq(1);
+  });
+
 })

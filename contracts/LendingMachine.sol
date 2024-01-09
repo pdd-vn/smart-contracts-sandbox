@@ -94,8 +94,7 @@ contract LendingMachine is LendingMachineBase {
 
         require(token.tmp_owner != address(0), "ERROR: Token is not lended");
 
-        uint256 current_lend_duration = (block.timestamp - token.lending_at) /
-            86400;
+        uint256 current_lend_duration = (block.timestamp - token.lending_at) / 30; // sec
         require(
             current_lend_duration <= token.lend_duration,
             "ERROR: Lend duration exceeded. NFT will be transfered to new owner"
@@ -121,12 +120,11 @@ contract LendingMachine is LendingMachineBase {
         NFT memory token = nft_id_mapping[token_id];
         require(msg.sender == token.tmp_owner, "ERROR: Not token's temporary owner");
         
-        // uint256 current_lend_duration = (block.timestamp - token.lending_at) /
-        //     86400;
-        // require(
-        //     current_lend_duration > token.lend_duration,
-        //     "ERROR: Item is still in lending duration. Please wait until lend duration exceeded"
-        // );
+        uint256 current_lend_duration = (block.timestamp - token.lending_at) / 30; // sec
+        require(
+            current_lend_duration > token.lend_duration,
+            "ERROR: Item is still in lending duration. Please wait until lend duration exceeded"
+        );
 
         this._internal_transfer_nft(msg.sender, token_id);
         nft_id_mapping[token_id].owner = msg.sender;
